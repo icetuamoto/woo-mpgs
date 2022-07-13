@@ -213,14 +213,21 @@ function woo_mpgs_init() {
 			// Prepare session request
 			$session_request = array();
 			$session_request['apiOperation']                = "CREATE_CHECKOUT_SESSION";
-			$session_request['userId']                      = $order->get_user_id();
 			$session_request['order']['id']                 = $order_id;
 			$session_request['order']['amount']             = $order->get_total();
 			$session_request['order']['currency']           = get_woocommerce_currency();
 			$session_request['interaction']['returnUrl']    = add_query_arg( array( 'order_id' => $order_id, 'wc-api' => 'woo_mpgs' ), home_url('/') );
+			if((int) $this->api_version <= 61)
+			{
+				$session_request['userId']                      = $order->get_user_id();
+			}
 			if( (int) $this->api_version >= 52 ) {
 				$session_request['interaction']['operation']    = "PURCHASE";
             }
+			if ( (int) $this->api_version >= 63 )
+			{
+				$session_request['apiOperation']			= "INITIATE_CHECKOUT"
+			}
 
 			/**
 			 * Filters the session request.
